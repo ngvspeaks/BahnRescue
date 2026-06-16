@@ -1,0 +1,10 @@
+/target/
+/apache-maven-3.9.6/
+*.log
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.factorypath
+/bin/

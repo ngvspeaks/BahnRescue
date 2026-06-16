@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BahnRescue Simulation Control Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #3b82f6;
+            --accent-success: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            backdrop-filter: blur(16px);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+        }
+
+        .editor-section, .console-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        textarea {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: #10b981;
+            padding: 1rem;
+            resize: none;
+            height: 320px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-trigger {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 20px -3px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-trigger:active {
+            transform: translateY(0);
+        }
+
+        .console-output {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-muted);
+            padding: 1rem;
+            height: 380px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .log-entry {
+            line-height: 1.4;
+        }
+
+        .log-info { color: #3b82f6; }
+        .log-success { color: #10b981; }
+        .log-error { color: #ef4444; }
+        .log-payload { color: #e5e7eb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚄 BahnRescue Control Center</h1>
+    <p class="subtitle">Hexagonal/DDD Delay Simulation & Orchestration Engine</p>
+
+    <div class="grid">
+        <div class="editor-section">
+            <label for="payload">Simulation JSON Payload</label>
+            <textarea id="payload">{
+  "eventId": "evt_99283f3a",
+  "timestamp": "2026-06-16T17:20:00Z",
+  "commuterName": "Nibin",
+  "affectedLine": "S1 (S-Bahn Rhein-Neckar)",
+  "currentLocation": "Edingen-West",
+  "destination": "Mannheim Hbf",
+  "scheduledDeparture": "17:32",
+  "delayMinutes": 14,
+  "originalPlatform": "1",
+  "newPlatform": "3",
+  "incidentType": "SIGNAL_FAILURE"
+}</textarea>
+            <button class="btn-trigger" id="btn-publish" onclick="publishEvent()">
+                🚀 Publish Live Transit Event
+            </button>
+        </div>
+
+        <div class="console-section">
+            <label>Real-Time Audit Console</label>
+            <div class="console-output" id="console">
+                <span class="log-entry log-info">[SYSTEM] BahnRescue Simulation Console Ready.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const consoleDiv = document.getElementById('console');
+
+    function log(message, type = 'info') {
+        const span = document.createElement('span');
+        span.className = `log-entry log-${type}`;
+        span.textContent = message;
+        consoleDiv.appendChild(span);
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    }
+
+    async function publishEvent() {
+        const payloadText = document.getElementById('payload').value;
+        const btn = document.getElementById('btn-publish');
+        
+        btn.disabled = true;
+        btn.textContent = 'Publishing to Kafka...';
+
+        log(`\n[HTTP] POST /api/v1/test/event`, 'info');
+        log(`[Payload] -> ${payloadText.replace(/\n\s*/g, ' ')}`, 'payload');
+
+        try {
+            const parsedPayload = JSON.parse(payloadText);
+            const response = await fetch('/api/v1/test/event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(parsedPayload)
+            });
+
+            const responseData = await response.json();
+
+            if (response.status === 202) {
+                log(`[HTTP] Response: 202 Accepted`, 'success');
+                log(`[Broker Output] -> ${JSON.stringify(responseData)}`, 'success');
+            } else {
+                log(`[HTTP] Response: ${response.status}`, 'error');
+                log(`[Error Response] -> ${JSON.stringify(responseData)}`, 'error');
+            }
+        } catch (e) {
+            log(`[FAIL] ${e.message}`, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '🚀 Publish Live Transit Event';
+        }
+    }
+</script>
+
+</body>
+</html>
