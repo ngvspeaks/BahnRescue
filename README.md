@@ -9,6 +9,14 @@ An event-driven transit platform core delay notification engine designed for hig
 
 ---
 
+### 📺 Live Demo Simulation
+
+Below is the live simulation running from the control center webpage, dispatching events to Kafka, and processing them using virtual threads:
+
+![BahnRescue Simulation Flow](publish_event_simulation.webp)
+
+---
+
 ## 🚀 Key Architectural Highlights
 
 *   **Virtual Threads (Project Loom):** High-throughput, resource-efficient asynchronous simulation using Java's virtual thread per-task executors (`Executors.newVirtualThreadPerTaskExecutor()`).
